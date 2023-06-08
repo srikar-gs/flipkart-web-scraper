@@ -1,0 +1,152 @@
+## Importing all the necessary libraries
+
+import requests
+
+from selenium import webdriver
+
+import pandas as pd
+
+from time import sleep
+
+from bs4 import BeautifulSoup
+
+## Headers for request and response
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:106.0) Gecko/20100101 Firefox/106.0'}
+
+## Access the browser
+
+# Set the path
+
+path = 'C://chromedriver.exe'
+
+# Setup the browser
+
+browser = webdriver.Chrome(executable_path=path)
+
+## Load the Flipkart webpage
+## According to the search query
+
+# load the webpage
+
+search_query = 'laptops'.replace(' ','+')
+
+base_url = 'https://www.flipkart.com/search?q={0}'.format(search_query)
+
+browser.get(base_url)
+
+## Scrape the data
+
+# Empty lists to store the scraped data
+
+​
+
+product_names=[]
+
+price = []
+
+rating = []
+
+​
+
+# Scraping code
+
+​
+
+for i in range(1,11):
+
+    print('Processing {0}'.format(base_url + '&page={0}'.format(i)))
+
+    
+
+    response = requests.get(base_url + '&page={0}'.format(i), headers=headers)
+
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    
+
+    product = soup.find_all('div', {'class':"_4rR01T"})
+
+    cost = soup.find_all('div', {'class': '_30jeq3 _1_WHN1'})
+
+    rting = soup.find_all('div', {'class': '_3LWZlK'})
+
+    
+
+    sleep(1)
+
+    
+
+    # Appending the scraped data to the lists and storing them
+
+    
+
+    for i in product:
+
+        product_names.append(i.text)
+
+        
+
+    for i in cost:
+
+        price.append((i.text)[1:])
+
+        
+
+    for i in rting:
+
+        rating.append(i.text)
+
+## Display all the product names
+
+for i in product_names:
+
+    print(i)
+
+## Display the price of each product
+
+for i in price:
+
+    print(i)
+
+## Display the rating of each product
+
+for i in rating:
+
+    print(i)
+
+## Check the length of each column
+
+print("Products: ", len(price))
+
+print("Price: ", len(price))
+
+del rating[240:350]
+
+del rating[240:350]
+
+print("Ratings: ", len(rating))
+
+## Defining a dictionary holding the columns
+
+data = {'Product Name':product_names, 
+
+        'Price':price, 
+
+        'Rating':rating
+
+}
+
+# Creating a DataFrame 
+
+df = pd.DataFrame(data)
+
+## Getting the first 5 rows of our Scraped Data
+
+df.head()
+
+df.shape
+
+## Let's convert the dataframe to CSV and Export¶
+
+df.to_csv('H:\My Drive\LEARNING\Datasets\laptops.csv', index=False)
